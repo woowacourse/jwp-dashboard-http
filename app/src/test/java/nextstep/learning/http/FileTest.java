@@ -1,9 +1,12 @@
 package nextstep.learning.http;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -25,8 +28,8 @@ class FileTest {
     void resource_디렉터리에_있는_파일의_경로를_찾는다() {
         final String fileName = "nextstep.txt";
 
-        // todo
-        final String actual = "";
+        final URL resource = getClass().getClassLoader().getResource(fileName);
+        final String actual = resource.getFile();
 
         assertThat(actual).endsWith(fileName);
     }
@@ -36,14 +39,12 @@ class FileTest {
      * File, Files 클래스를 사용하여 파일의 내용을 읽어보자.
      */
     @Test
-    void 파일의_내용을_읽는다() {
+    void 파일의_내용을_읽는다() throws IOException {
         final String fileName = "nextstep.txt";
 
-        // todo
-        final Path path = null;
-
-        // todo
-        final List<String> actual = Lists.emptyList();
+        final URL resource = getClass().getClassLoader().getResource(fileName);
+        final Path path = new File(resource.getPath()).toPath();
+        final List<String> actual = Files.readAllLines(path);
 
         assertThat(actual).containsOnly("nextstep");
     }
