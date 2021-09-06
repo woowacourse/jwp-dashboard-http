@@ -32,7 +32,7 @@ class FrontControllerTest {
         FRONT_CONTROLLER.doGet(request, response);
 
         // then
-        assertThat(response.toString()).hasToString(expectedResponse.toString());
+        assertThat(response.message()).isEqualTo(expectedResponse.message());
     }
 
     @Test
@@ -42,7 +42,7 @@ class FrontControllerTest {
         Response response = new Response();
 
         assertThatThrownBy(() -> FRONT_CONTROLLER.doGet(request, response))
-            .isInstanceOf(NotFoundException.class);
+            .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -52,7 +52,7 @@ class FrontControllerTest {
         Response response = new Response();
 
         assertThatThrownBy(() -> FRONT_CONTROLLER.doPost(request, response))
-            .isInstanceOf(MethodNotAllowedException.class);
+            .isExactlyInstanceOf(MethodNotAllowedException.class);
     }
 
     private Request createRequest(String uri, HttpMethod httpMethod) {

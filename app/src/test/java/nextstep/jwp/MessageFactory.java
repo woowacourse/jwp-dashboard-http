@@ -1,6 +1,7 @@
 package nextstep.jwp;
 
 import java.io.IOException;
+import java.util.UUID;
 import nextstep.jwp.utils.FileConverter;
 
 public class MessageFactory {
@@ -8,6 +9,7 @@ public class MessageFactory {
     private static final String NEW_LINE = "\r\n";
     private static final String HOST = "Host: http://localhost:8080";
     private static final String CONNECTION = "Connection: keep-alive";
+    public static final UUID LOGIN_UUID = java.util.UUID.randomUUID();
 
     private MessageFactory() {
     }

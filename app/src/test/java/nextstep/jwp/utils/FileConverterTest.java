@@ -15,7 +15,6 @@ class FileConverterTest {
 
         String result = FileConverter.fileToString("/index.html");
 
-        System.out.println(result);
         assertThat(result).isNotNull().isNotEqualTo("");
     }
 }

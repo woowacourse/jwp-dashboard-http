@@ -1,5 +1,8 @@
 package nextstep.jwp.model;
 
+import java.util.Objects;
+import nextstep.jwp.exception.BadRequestException;
+
 public class User {
 
     private long id;
@@ -12,10 +15,18 @@ public class User {
     }
 
     public User(long id, String account, String password, String email) {
+        validate(account, password);
         this.id = id;
         this.account = account;
         this.password = password;
         this.email = email;
+    }
+
+    private void validate(String account, String password) {
+        if (Objects.isNull(account) || Objects.isNull(password)
+            || account.length() < 1 || password.length() < 1) {
+            throw new BadRequestException();
+        }
     }
 
     public boolean checkPassword(String password) {
@@ -36,5 +47,9 @@ public class User {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

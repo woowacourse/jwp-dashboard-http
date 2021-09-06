@@ -29,7 +29,7 @@ class RequestMappingTest {
         Controller controller = REQUEST_MAPPING.getController(request);
 
         // then
-        assertThat(controller).isInstanceOf(LoginController.class);
+        assertThat(controller).isExactlyInstanceOf(LoginController.class);
     }
 
     @Test
@@ -42,7 +42,7 @@ class RequestMappingTest {
         Controller controller = REQUEST_MAPPING.getController(request);
 
         // then
-        assertThat(controller).isInstanceOf(RegisterController.class);
+        assertThat(controller).isExactlyInstanceOf(RegisterController.class);
     }
 
     @Test
@@ -51,7 +51,7 @@ class RequestMappingTest {
         Request request = createRequest("/error");
 
         assertThatThrownBy(() -> REQUEST_MAPPING.getController(request))
-            .isInstanceOf(NotFoundException.class);
+            .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -61,7 +61,7 @@ class RequestMappingTest {
 
         Controller controller = REQUEST_MAPPING.getController(request);
 
-        assertThat(controller).isInstanceOf(FrontController.class);
+        assertThat(controller).isExactlyInstanceOf(FrontController.class);
     }
 
     private Request createRequest(String uri) {

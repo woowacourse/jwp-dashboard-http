@@ -8,11 +8,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Objects;
 import nextstep.jwp.controller.Controller;
-import nextstep.jwp.exception.BadRequestMessageException;
-import nextstep.jwp.exception.NotFoundException;
-import nextstep.jwp.exception.UnauthorizedException;
-import nextstep.jwp.exception.UsernameConflictException;
-import nextstep.jwp.http.HttpStatus;
+import nextstep.jwp.controller.ControllerAdvice;
+import nextstep.jwp.exception.AbstractHttpException;
 import nextstep.jwp.http.Request;
 import nextstep.jwp.http.Response;
 import nextstep.jwp.utils.HttpRequestConverter;
@@ -34,6 +31,7 @@ public class RequestHandler implements Runnable {
     public void run() {
         LOG.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
             connection.getPort());
+        LOG.debug("쓰레드 이름 : {}", Thread.currentThread().getName());
 
         try (final InputStream inputStream = connection.getInputStream();
             final OutputStream outputStream = connection.getOutputStream();
@@ -52,21 +50,20 @@ public class RequestHandler implements Runnable {
     }
 
     private Response messageConvert(BufferedReader bufferedReader) throws IOException {
+        Response response = new Response();
         try {
             final Request request = HttpRequestConverter.createdRequest(bufferedReader);
-            Response response = new Response();
+            response.addCookie(request);
             Controller controller = REQUEST_MAPPING.getController(request);
             controller.service(request, response);
             return response;
-        } catch (BadRequestMessageException exception) {
-            return Response.createErrorRequest(exception.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (NotFoundException | UnauthorizedException exception) {
-            return Response.create302Found(exception.getMessage());
-        } catch (UsernameConflictException exception) {
-            return Response.createErrorRequest(exception.getMessage(), HttpStatus.CONFLICT);
+        } catch (AbstractHttpException exception) {
+            ControllerAdvice.errorHandle(exception, response);
+            return response;
         } catch (Exception exception) {
             LOG.error("알수없는 에러가 발생 : {}", exception.getMessage());
-            return Response.create302Found("500.html");
+            response.set302Found("/500.html");
+            return response;
         }
     }
 

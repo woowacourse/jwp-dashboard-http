@@ -30,10 +30,6 @@ public class Request {
         return body.get(key);
     }
 
-    public String getSession() {
-        return httpCookie.jSessionId();
-    }
-
     public boolean isUriMatch(String target) {
         return uri.getResourceUri().equals(target);
     }
@@ -60,6 +56,10 @@ public class Request {
 
     public HttpSession getHttpSession() {
         return httpSession;
+    }
+
+    public String getCookie(String key) {
+        return httpCookie.getCookie(key);
     }
 
     public String getHttpVersion() {
@@ -93,6 +93,11 @@ public class Request {
 
         public Builder header(Map<String, String> header) {
             this.header = new RequestHeader(header);
+            return this;
+        }
+
+        public Builder header(RequestHeader header) {
+            this.header = header;
             return this;
         }
 

@@ -11,6 +11,7 @@ import nextstep.jwp.MessageFactory;
 import nextstep.jwp.exception.UnauthorizedException;
 import nextstep.jwp.http.HttpMethod;
 import nextstep.jwp.http.HttpSession;
+import nextstep.jwp.http.HttpSessions;
 import nextstep.jwp.http.Request;
 import nextstep.jwp.http.Request.Builder;
 import nextstep.jwp.http.Response;
@@ -25,6 +26,11 @@ class LoginControllerTest {
     private static final LoginController LOGIN_CONTROLLER = new LoginController(new LoginService());
     private static final String NEW_LINE = "\r\n";
 
+    static {
+        HttpSessions.add(MessageFactory.LOGIN_UUID.toString(),
+            new HttpSession(MessageFactory.LOGIN_UUID.toString()));
+    }
+
     @Test
     @DisplayName("login page 반환 테스트")
     void doGet() throws IOException {
@@ -36,7 +42,7 @@ class LoginControllerTest {
         LOGIN_CONTROLLER.doGet(request, response);
 
         // then
-        assertThat(response.toString()).hasToString(createResponseOK());
+        assertThat(response.message()).isEqualTo(createResponseOK());
     }
 
     @Test
@@ -49,30 +55,19 @@ class LoginControllerTest {
 
         // then
         for (String message : expected.split(NEW_LINE)) {
-            assertThat(response.toString()).contains(message);
+            assertThat(response.message()).contains(message);
         }
-    }
-
-    @Test
-    @DisplayName("로그인을 성공하면 cookie 를 반환한다.")
-    void doPostCookie() {
-        // given
-        String expected = "Set-Cookie: JSESSIONID=";
-
-        // when
-        Response response = getPostSuccessResponse();
-
-        // then
-        assertThat(response.toString()).contains(expected);
     }
 
     @Test
     @DisplayName("로그인이 된 상태에서 페이지를 요청하면 index.html 로 리다이렉트 한다.")
     void doGetCookie() throws IOException {
         // given
-        String sessionId = getSessionId();
+        Map<String, String> header = new HashMap<>();
+        header.put("Cookie", "JSESSIONID=" + MessageFactory.LOGIN_UUID);
         Request request = createRequest(new HashMap<>(), HttpMethod.GET)
-            .httpSession(new HttpSession(sessionId))
+            .header(header)
+            .httpSession(HttpSessions.getSession(MessageFactory.LOGIN_UUID.toString()))
             .build();
         Response response = new Response();
 
@@ -80,16 +75,8 @@ class LoginControllerTest {
         LOGIN_CONTROLLER.doGet(request, response);
 
         // then
-        assertThat(response.toString())
-            .hasToString(MessageFactory.createResponseFound("index.html"));
-    }
-
-    private String getSessionId() {
-        Response response = getPostSuccessResponse();
-        String[] messages = response.toString().split(NEW_LINE);
-        String[] cookie = messages[2].split(":");
-        String[] cookieValue = cookie[1].trim().split("=");
-        return cookieValue[1];
+        assertThat(response.message())
+            .isEqualTo(MessageFactory.createResponseFound("index.html"));
     }
 
     @Test
@@ -103,7 +90,7 @@ class LoginControllerTest {
         Response response = new Response();
 
         assertThatThrownBy(() -> LOGIN_CONTROLLER.doPost(request, response))
-            .isInstanceOf(UnauthorizedException.class);
+            .isExactlyInstanceOf(UnauthorizedException.class);
     }
 
     private Builder createRequest(Map<String, String> body, HttpMethod httpMethod) {

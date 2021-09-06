@@ -11,6 +11,7 @@ import nextstep.jwp.MessageFactory;
 import nextstep.jwp.exception.UsernameConflictException;
 import nextstep.jwp.http.HttpMethod;
 import nextstep.jwp.http.HttpSession;
+import nextstep.jwp.http.HttpSessions;
 import nextstep.jwp.http.Request;
 import nextstep.jwp.http.Request.Builder;
 import nextstep.jwp.http.Response;
@@ -26,18 +27,25 @@ class RegisterControllerTest {
         = new RegisterController(new RegisterService(), new LoginService());
     private static final String NEW_LINE = "\r\n";
 
+    static {
+        HttpSessions.add(MessageFactory.LOGIN_UUID.toString(),
+            new HttpSession(MessageFactory.LOGIN_UUID.toString()));
+    }
+
     @Test
     @DisplayName("회원가입 페이지를 반환한다.")
     void doGet() throws IOException {
         // given
-        Request request = createRequest(new HashMap<>(), HttpMethod.GET).build();
+        Request request = createRequest(new HashMap<>(), HttpMethod.GET)
+            .build();
+
         Response response = new Response();
 
         // when
         REGISTER_CONTROLLER.doGet(request, response);
 
         // then
-        assertThat(response.toString()).hasToString(
+        assertThat(response.message()).isEqualTo(
             MessageFactory.createResponseOK("register.html", "text/html"));
     }
 
@@ -45,17 +53,20 @@ class RegisterControllerTest {
     @DisplayName("로그인이 된 상태라면 index.html 로 리다이랙트한다.")
     void doGetCookie() throws IOException {
         // given
-        String sessionId = getSessionId("test4");
-
+        Map<String, String> header = new HashMap<>();
+        header.put("Cookie", "JSESSIONID=" + MessageFactory.LOGIN_UUID);
         Request request = createRequest(new HashMap<>(), HttpMethod.GET)
-            .httpSession(new HttpSession(sessionId)).build();
+            .header(header)
+            .httpSession(HttpSessions.getSession(MessageFactory.LOGIN_UUID.toString()))
+            .build();
+
         Response response = new Response();
 
         // when
         REGISTER_CONTROLLER.doGet(request, response);
 
         // then
-        assertThat(response.toString()).hasToString(
+        assertThat(response.message()).isEqualTo(
             MessageFactory.createResponseFound("index.html"));
     }
 
@@ -69,21 +80,8 @@ class RegisterControllerTest {
 
         // then
         for (String message : expected.split(NEW_LINE)) {
-            assertThat(response.toString()).contains(message);
+            assertThat(response.message()).contains(message);
         }
-    }
-
-    @Test
-    @DisplayName("회원가입에 성공하면 cookie 가 같이 반환된다.")
-    void doPostCookie() {
-        // given
-        String expected = "Set-Cookie: JSESSIONID=";
-
-        // when
-        Response response = getPostResponse("test3");
-
-        // then
-        assertThat(response.toString()).contains(expected);
     }
 
     @Test
@@ -97,7 +95,7 @@ class RegisterControllerTest {
         Response response = new Response();
 
         assertThatThrownBy(() -> REGISTER_CONTROLLER.doPost(request, response))
-            .isInstanceOf(UsernameConflictException.class);
+            .isExactlyInstanceOf(UsernameConflictException.class);
     }
 
     private Builder createRequest(Map<String, String> body, HttpMethod httpMethod) {
@@ -121,13 +119,5 @@ class RegisterControllerTest {
         // when
         REGISTER_CONTROLLER.doPost(request, response);
         return response;
-    }
-
-    private String getSessionId(String id) {
-        Response response = getPostResponse(id);
-        String[] messages = response.toString().split(NEW_LINE);
-        String[] cookie = messages[2].split(":");
-        String[] cookieValue = cookie[1].trim().split("=");
-        return cookieValue[1];
     }
 }

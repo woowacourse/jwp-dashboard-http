@@ -32,7 +32,7 @@ class LoginServiceTest {
         User user = new User(0L, "error", "password", "");
 
         assertThatThrownBy(() -> LOGIN_SERVICE.login(user))
-            .isInstanceOf(UnauthorizedException.class);
+            .isExactlyInstanceOf(UnauthorizedException.class);
     }
 
     @Test
@@ -41,7 +41,7 @@ class LoginServiceTest {
         User user = new User(0L, "gugu", "error", "");
 
         assertThatThrownBy(() -> LOGIN_SERVICE.login(user))
-            .isInstanceOf(UnauthorizedException.class);
+            .isExactlyInstanceOf(UnauthorizedException.class);
     }
 
     @Test

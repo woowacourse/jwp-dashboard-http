@@ -7,8 +7,8 @@ public enum HttpStatus {
     BAD_REQUEST(400, "Bad Request"),
     UNAUTHORIZED(401, "Unauthorized"),
     NOT_FOUND(404, "Not Found"),
-    CONFLICT(409, "Conflict"),
-    INTERNAL_SERVER_ERROR(500, "Internal Server Error");
+    METHOD_NOT_ALLOWED(405, "Method Not Allowed"),
+    CONFLICT(409, "Conflict");
 
     private final int status;
     private final String statusMessage;
@@ -24,5 +24,9 @@ public enum HttpStatus {
 
     public String getStatusMessage() {
         return statusMessage;
+    }
+
+    public boolean equalsStatus(HttpStatus httpStatus) {
+        return this == httpStatus;
     }
 }

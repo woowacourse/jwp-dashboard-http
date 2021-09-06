@@ -30,7 +30,7 @@ class InMemoryUserRepositoryTest {
         User user = new User(0, "gugu", "password", "mungto@test.com");
 
         assertThatThrownBy(() -> InMemoryUserRepository.save(user))
-            .isInstanceOf(UsernameConflictException.class);
+            .isExactlyInstanceOf(UsernameConflictException.class);
     }
 
     @Test

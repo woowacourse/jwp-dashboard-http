@@ -21,7 +21,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseOK(INDEX_HTML, TEXT_HTML);
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     @Test
@@ -32,7 +32,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseOK("login.html", TEXT_HTML);
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     @Test
@@ -43,9 +43,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseFound(INDEX_HTML);
-        for (String message : expected.split(NEW_LINE)) {
-            assertThat(socket.output()).contains(message);
-        }
+        testCheck(socket, expected);
     }
 
     @Test
@@ -56,7 +54,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseOK("register.html", TEXT_HTML);
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     @Test
@@ -69,9 +67,7 @@ class RequestHandlerTest {
 
         String expected = MessageFactory.createResponseFound(INDEX_HTML);
 
-        for (String message : expected.split(NEW_LINE)) {
-            assertThat(socket.output()).contains(message);
-        }
+        testCheck(socket, expected);
     }
 
     @Test
@@ -84,7 +80,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseOK(styleCss, type);
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     @Test
@@ -97,7 +93,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseOK(scripts, type);
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     @Test
@@ -110,8 +106,8 @@ class RequestHandlerTest {
         String expected = String.join(NEW_LINE, "HTTP/1.1 400 Bad Request",
             "Content-Type: application/json",
             "",
-            "{\"message\": \"잘못된 request message 입니다.\"}");
-        assertThat(socket.output()).isEqualTo(expected);
+            "{\"message\": \"잘못된 request 입니다.\"}");
+        testCheck(socket, expected);
     }
 
     @Test
@@ -122,7 +118,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseFound("404.html");
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     @Test
@@ -138,7 +134,7 @@ class RequestHandlerTest {
             "",
             "{\"message\": \"이미 존재하는 아이디 입니다.\"}"
         );
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     @Test
@@ -150,7 +146,7 @@ class RequestHandlerTest {
         final MockSocket socket = getMockSocket(httpRequest);
 
         String expected = MessageFactory.createResponseFound("401.html");
-        assertThat(socket.output()).isEqualTo(expected);
+        testCheck(socket, expected);
     }
 
     private MockSocket getMockSocket(String httpRequest) {
@@ -159,5 +155,11 @@ class RequestHandlerTest {
 
         requestHandler.run();
         return socket;
+    }
+
+    private void testCheck(MockSocket socket, String expected) {
+        for (String message : expected.split(NEW_LINE)) {
+            assertThat(socket.output()).contains(message);
+        }
     }
 }

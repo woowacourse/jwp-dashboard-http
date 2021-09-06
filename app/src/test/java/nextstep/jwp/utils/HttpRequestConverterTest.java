@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import nextstep.jwp.MockSocket;
-import nextstep.jwp.exception.BadRequestMessageException;
+import nextstep.jwp.exception.BadRequestException;
 import nextstep.jwp.http.HttpMethod;
 import nextstep.jwp.http.Request;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class HttpRequestConverterTest {
     void createdRequestException() throws IOException {
         BufferedReader bufferedReader = createBufferedReader("");
         assertThatThrownBy(() -> HttpRequestConverter.createdRequest(bufferedReader))
-            .isInstanceOf(BadRequestMessageException.class);
+            .isExactlyInstanceOf(BadRequestException.class);
     }
 
     private BufferedReader createBufferedReader(String message) throws IOException {

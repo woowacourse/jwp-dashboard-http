@@ -7,7 +7,8 @@ public class HttpSessions {
 
     private static final Map<String, HttpSession> SESSIONS = new ConcurrentHashMap<>();
 
-    private HttpSessions() {}
+    private HttpSessions() {
+    }
 
     public static HttpSession getSession(String id) {
         return SESSIONS.get(id);

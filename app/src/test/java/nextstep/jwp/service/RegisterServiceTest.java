@@ -27,6 +27,6 @@ class RegisterServiceTest {
         User user = new User(0L, "gugu", "password", "");
 
         assertThatThrownBy(() -> REGISTER_SERVICE.save(user))
-            .isInstanceOf(UsernameConflictException.class);
+            .isExactlyInstanceOf(UsernameConflictException.class);
     }
 }

@@ -14,7 +14,7 @@ public class FileConverter {
     public static String fileToString(String uri) throws IOException {
         URL resource = FileConverter.class.getClassLoader().getResource("static" + uri);
 
-        return new String(Files.readAllBytes(
-            new File(Objects.requireNonNull(resource).getFile()).toPath()));
+        return Files.readString(
+            new File(Objects.requireNonNull(resource).getFile()).toPath());
     }
 }

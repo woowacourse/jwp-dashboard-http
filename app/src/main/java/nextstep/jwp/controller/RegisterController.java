@@ -41,11 +41,14 @@ public class RegisterController extends AbstractController {
         User user = new User(0, account, password, email);
         registerService.save(user);
 
+        addSession(request, user);
+
+        response.set302Found(INDEX_HTML);
+    }
+
+    private void addSession(Request request, User user) {
         HttpSession httpSession = request.getHttpSession();
         httpSession.setAttribute(httpSession.getId(), user);
         HttpSessions.add(httpSession.getId(), httpSession);
-
-        response.set302Found(INDEX_HTML);
-        response.addHeader("Set-Cookie", "JSESSIONID=" + httpSession.getId());
     }
 }
